@@ -46,12 +46,4 @@ plot1
 
 matched_fish <- match_data(m.out1)
 
-matched_model <- glm(high_fish ~ ., data = matched_fish, family = "binomial")
-matched_eps <- predict(matched_model, type = "response")
-matched_lps <- predict(matched_model)
-matched_temp.data <- data.frame(lps = matched_lps, treated = as.factor(matched_fish$high_fish))
-
-ggplot(matched_temp.data, aes(x = matched_lps, fill = treated, color = treated)) + 
-  geom_histogram(alpha = 0.5, position = "identity") + 
-  xlab("Linearized propensity score") 
 
