@@ -1,3 +1,4 @@
+
 # Following Example 8
 
 library(MatchIt)
@@ -12,6 +13,7 @@ fish_clean <- fish %>%
   select(high_fish, gender, age, income, income.missing, race, education,
          smoking.ever, smoking.now)
 
+# Propensity Score Calculation
 model <- glm(high_fish ~ ., data = fish_clean, family = "binomial")
 eps <- predict(model, type = "response")
 lps <- predict(model)
@@ -22,19 +24,25 @@ ggplot(temp.data, aes(x = lps, fill = treated, color = treated)) +
   xlab("Linearized propensity score") 
 
 
+
+# Original Covariate Balancing
+
 m.out0 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                     education + smoking.ever + smoking.now, data = fish_clean,
                   method = NULL, distance = "glm")
 
 summary(m.out0)
-plot(summary(m.out0), abs = F)
+plot0 = plot(summary(m.out0), abs = F)
+plot0
 
-
+# Matched Covariate Balancing
 m.out1 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                     education + smoking.ever + smoking.now, data = fish_clean,
                   estimand = "ATT", 
                   method = "nearest", distance = lps)
 summary(m.out1)
+plot1 = plot(summary(m.out1), abs = F)
+plot1
 
 matched_fish <- match_data(m.out1)
 
