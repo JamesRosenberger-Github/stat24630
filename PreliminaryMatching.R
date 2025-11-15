@@ -3,7 +3,7 @@
 library("MatchIt")
 library(tidyverse)
 
-fish <- read_csv("~/Downloads/nhanes_fish.csv")
+fish <- read_csv("nhanes_fish.csv")
 
 fish_clean <- fish %>%
   mutate(high_fish = ifelse(fish.level == "high", 1, 0)) %>%
@@ -29,3 +29,4 @@ m.out1 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                   estimand = "ATT", 
                   method = "nearest", distance = lps)
 summary(m.out1)
+
