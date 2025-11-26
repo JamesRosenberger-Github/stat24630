@@ -67,5 +67,51 @@ matched_fish_opt <- match_data(m.out2)
 
 
 
-#regression adjsutment on matching
+
+#Neyman's Approach without Regression Adjustment
+m.data <- match.data(m.out1)
+
+tau_hat_vec <- sapply(levels(m.data$subclass), function(sc) {
+  treated <- m.data$mercury[m.data$subclass == sc & m.data$high_fish == 1]
+  control <- m.data$mercury[m.data$subclass == sc & m.data$high_fish == 0]
+  return(treated - control)
+})
+
+tau_hat <- mean(tau_hat_vec, na.rm = T)
+sd_tau_hat <- sd(tau_hat_vec)/sqrt(length(tau_hat_vec))
+print(c(tau_hat, sd_tau_hat))
+
+## 95% CI
+print(c(tau_hat- 1.96 * sd_tau_hat, tau_hat + 1.96 * sd_tau_hat))
+
+
+
+#Neyman's Approach with Regression Adjustment
+
+## First run a linear regression on the control (remember to remove the treatment assignment variable!)
+
+fit0 <- lm(mercury ~ gender + age + income +
+             income.missing + race + education + 
+             smoking.ever + smoking.now, 
+           data = m.data[m.data$high_fish == 0, -c(2)])
+
+m.data$predicted_y0 <- predict(fit0, m.data)
+
+## Neyman's approach with regression adjustment
+## First run a linear regression on the control (remember to remove the treatment assignment variable!)
+
+tau_hat_vec_adjusted <- sapply(levels(m.data$subclass), function(sc) {
+  treated <- m.data$mercury[m.data$subclass == sc & m.data$high_fish == 1]
+  control <- m.data$mercury[m.data$subclass == sc & m.data$high_fish == 0]
+  
+  bias <- m.data$predicted_y0[m.data$subclass == sc & m.data$high_fish == 1] - 
+    m.data$predicted_y0[m.data$subclass == sc & m.data$high_fish == 0]
+  control.adjusted <- control + bias
+  
+  return(treated - control.adjusted)
+})
+
+tau_hat_adjusted <- mean(tau_hat_vec_adjusted)
+sd_tau_hat_adjusted <- sd(tau_hat_vec_adjusted)/sqrt(length(tau_hat_vec_adjusted))
+print(c(tau_hat_adjusted, sd_tau_hat_adjusted))
 
