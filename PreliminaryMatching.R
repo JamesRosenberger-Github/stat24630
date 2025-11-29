@@ -31,7 +31,6 @@ ggplot(temp.data_eps, aes(x = eps, fill = treated, color = treated)) +
   geom_histogram(alpha = 0.5, position = "identity") + 
   xlab("Linearized propensity score")
 
-
 # Covariate Balancing Before matching
 m.out0 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                     education + smoking.ever + smoking.now, data = fish_clean,
@@ -52,8 +51,8 @@ plot1
 
 matched_fish_g <- match_data(m.out1)
 
-
-#Optimal Matched Covariate Balancing (in this case the result is equivalent to greedy)
+# Optimal Matched Covariate Balancing (in this case the result is 
+# functionally equivalent to greedy)
 m.out2 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                     education + smoking.ever + smoking.now, data = fish_clean,
                   estimand = "ATT", 
@@ -68,8 +67,8 @@ matched_fish_opt <- match_data(m.out2)
 
 
 
-#Neyman's Approach without Regression Adjustment
-m.data <- match.data(m.out1)
+#Neyman's Approach without Regression Adjustment (Pairwise Random Exp.)
+m.data <- match.data(m.out2)
 
 tau_hat_vec <- sapply(levels(m.data$subclass), function(sc) {
   treated <- m.data$mercury[m.data$subclass == sc & m.data$high_fish == 1]
@@ -114,4 +113,7 @@ tau_hat_vec_adjusted <- sapply(levels(m.data$subclass), function(sc) {
 tau_hat_adjusted <- mean(tau_hat_vec_adjusted)
 sd_tau_hat_adjusted <- sd(tau_hat_vec_adjusted)/sqrt(length(tau_hat_vec_adjusted))
 print(c(tau_hat_adjusted, sd_tau_hat_adjusted))
+
+## 95% CI
+print(c(tau_hat_adjusted - 1.96 * sd_tau_hat_adjusted, tau_hat_adjusted + 1.96 * sd_tau_hat_adjusted))
 
