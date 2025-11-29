@@ -81,7 +81,7 @@ temp.data.trimmed$weights <- weights.trimmed
 
 #love plot after trimming is worse, so definitely stick with untrimmed
 raw.smd <- love.plot(fish_indic.trimmed[, -c(1:2)], fish_indic.trimmed$high_fish)
-weighted.smd <- love.plot(fish_indic.trimmed[, -c(1:2)], fish_indic.trimmed$high_fish, weights = weights)
+weighted.smd <- love.plot(fish_indic.trimmed[, -c(1:2)], fish_indic.trimmed$high_fish, weights = weights.trimmed)
 
 plot.data <- data.frame(smd = c(raw.smd, weighted.smd), 
                         covariates = c(names(raw.smd), names(weighted.smd)),
