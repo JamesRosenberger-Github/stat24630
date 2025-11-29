@@ -98,7 +98,7 @@ ggplot(plot.data) + geom_point(aes(x = as.numeric(smd), y = covariates, color = 
 
 #------Because trimming made it worse, we estimate IPW using the untrimmed data
 
-lm.result <- lm(mercury ~ high_fish, weights = weights, data = fish_indic)
+lm.result <- lm(mercury ~ high_fish, weights = weights.trimmed, data = fish_indic.trimmed)
 summary(lm.result)
 
 #sandwich variance estimate
@@ -112,9 +112,9 @@ result
 
 
 # using bootstrap
-X <- model.matrix(model)
-Y <- fish_indic$mercury
-W <- fish_indic$high_fish
+X <- model.matrix(model.trimmed)
+Y <- fish_indic.trimmed$mercury
+W <- fish_indic.trimmed$high_fish
 
 SE_boostrap <- IPW_bootstrap(W, Y, X, 5000)[2]
 result_bootstrap <- c(tau_hat, SE_boostrap, 
