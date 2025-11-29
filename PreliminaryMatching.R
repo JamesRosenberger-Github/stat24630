@@ -117,3 +117,32 @@ print(c(tau_hat_adjusted, sd_tau_hat_adjusted))
 ## 95% CI
 print(c(tau_hat_adjusted - 1.96 * sd_tau_hat_adjusted, tau_hat_adjusted + 1.96 * sd_tau_hat_adjusted))
 
+
+## Histograms of covariate distributions before and after matching
+
+# Notice that matching greatly improves overlap
+# creating a new column with appropriate labels
+help <- function(df, label) {
+  df2 <- df[, c("age", "income", "high_fish")]
+  df2$sample <- label
+  df2
+}
+
+# defining a new larger object for graphing
+hist_dat <- rbind(help(fish_clean, "Original"), help(m.data, "Matched"))
+hist_dat$sample <- factor(hist_dat$sample, levels = c("Original", "Matched"))
+hist_dat$high_fish  <- factor(hist_dat$high_fish,
+                              levels = c(0, 1),
+                              labels = c("Control", "Treated"))
+
+ggplot(hist_dat, aes(x = age, fill = high_fish)) +
+  geom_histogram(position = "identity", alpha = 0.6) +
+  facet_grid(sample ~ .) +
+  labs(title = "Age Distributions by Different Procedures (Matching)",
+       x = "age", y = "Count")
+
+ggplot(hist_dat, aes(x = income, fill = high_fish)) +
+  geom_histogram(position = "identity", alpha = 0.6) +
+  facet_grid(sample ~ .) +
+  labs(title = "Income Distributions by Different Procedures (Matching)",
+       x = "Income", y = "Count")

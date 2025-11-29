@@ -36,7 +36,7 @@ ggplot(temp.data.eps, aes(x = eps, fill = treated, color = treated)) +
   ggtitle("Histogram of eps before trimming") +
   theme_bw()
 
-#chancing race into indicator variables
+#changing race into indicator variables
 #note that there is no race equal to 5 because of NHANES recoding
 fish_indic <- fish_clean %>%
   mutate(mexican_american = ifelse(race == 1, 1, 0),
@@ -79,7 +79,7 @@ eps.trimmed <- predict(model.trimmed, type = "response")
 weights.trimmed <- ifelse(fish_indic.trimmed$high_fish == 1, 1/eps.trimmed, 1/(1 - eps.trimmed))
 temp.data.trimmed$weights <- weights.trimmed
 
-#love plot after trimming is worse, so definitely stick with untrimmed
+#love plot after trimming is better
 raw.smd <- love.plot(fish_indic.trimmed[, -c(1:2)], fish_indic.trimmed$high_fish)
 weighted.smd <- love.plot(fish_indic.trimmed[, -c(1:2)], fish_indic.trimmed$high_fish, weights = weights.trimmed)
 
@@ -95,8 +95,7 @@ ggplot(plot.data) + geom_point(aes(x = as.numeric(smd), y = covariates, color = 
   labs(x = 'Standardized Difference in Means') +
   theme_bw()
 
-
-#------Because trimming made it worse, we estimate IPW using the untrimmed data
+#------Because trimming made it better, we estimate IPW using the trimmed data
 
 lm.result <- lm(mercury ~ high_fish, weights = weights.trimmed, data = fish_indic.trimmed)
 summary(lm.result)
@@ -105,7 +104,7 @@ summary(lm.result)
 tau_hat <- lm.result$coefficients[2]
 SE <- sqrt(diag(vcovHC(lm.result, type = "HC2")))[2]
 
-## get the 95% CI
+# get the 95% CI
 result <- c(tau_hat, SE, c(tau_hat- 1.96 * SE, tau_hat + 1.96 * SE))
 names(result) <- c("est", "sd", "CI_lower", "CI_upper")
 result
@@ -121,3 +120,38 @@ result_bootstrap <- c(tau_hat, SE_boostrap,
                       c(tau_hat- 1.96 * SE_boostrap, tau_hat + 1.96 * SE_boostrap))
 names(result_bootstrap) <- c("est", "sd (bootstrap)", "CI_lower (bootstrap)", "CI_upper (bootstrap)")
 result_bootstrap
+
+# Comparing covariate distributions before and after IPW procedure (post-trim)
+
+help <- function(df, label, w) {
+  df2 <- df[, c("age", "income", "high_fish")]
+  df2$sample <- label
+  df2$w <- w
+  df2
+}
+
+# Building a larger object with different weighting schema
+hist_dat <- rbind(help(fish_indic.trimmed, "Original",
+                       w = rep(1, nrow(fish_indic.trimmed))),
+                  help(fish_indic.trimmed, "After IPW",
+                       w = weights.trimmed)
+)
+
+hist_dat$sample <- factor(hist_dat$sample, levels = c("Original", "After IPW"))
+hist_dat$high_fish  <- factor(hist_dat$high_fish,
+                              levels = c(0, 1),
+                              labels = c("Control", "Treated"))
+
+# plot for age
+ggplot(hist_dat, aes(x = age, fill = high_fish, weight = w)) +
+  geom_histogram(position = "identity", alpha = 0.6) +
+  facet_grid(sample ~ .) +
+  labs(title = "Trimmed Age Distributions by Procedure (IPW)",
+       x = "Age", y = "Weighted Count")
+
+# plot for income
+ggplot(hist_dat, aes(x = income, fill = high_fish, weight = w)) +
+  geom_histogram(position = "identity", alpha = 0.6) +
+  facet_grid(sample ~ .) +
+  labs(title = "Trimmed Income Distributions by Procedure (IPW)",
+       x = "Income", y = "Weighted Count")

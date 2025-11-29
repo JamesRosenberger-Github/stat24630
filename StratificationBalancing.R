@@ -160,3 +160,29 @@ result <- NeymanSRE(fish_clean$high_fish, fish_clean$mercury, fish_clean$blocks)
 result <- c(result[1:2], c(result[1] - 1.96 * result[2], result[1] + 1.96 * result[2]))
 names(result) <- c("est", "sd", "CI_lower", "CI_upper")
 result
+
+## Histograms of covariate distributions before and after sequential splitting
+## Note that original graphs are contained in PreliminaryMatching.R
+
+# creating a new df with needed labels
+hist_dat <- fish_clean[, c("age", "income", "high_fish", "blocks")]
+
+hist_dat$high_fish <- factor(
+  hist_dat$high_fish,
+  levels = c(0, 1),
+  labels = c("Control", "Treated")
+)
+
+# age blocks
+ggplot(hist_dat, aes(x = age, fill = high_fish)) +
+  geom_histogram(position = "identity", alpha = 0.6) +
+  facet_wrap(~ blocks) +
+  labs(title = "Age Distributions by Block After Sequential Splitting",
+       x = "Age", y = "Count")
+
+# income blocks
+ggplot(hist_dat, aes(x = income, fill = high_fish)) +
+  geom_histogram(position = "identity", alpha = 0.6) +
+  facet_wrap(~ blocks) +
+  labs(title = "Income Distributions by Block After Sequential Splitting",
+       x = "Income", y = "Count")
