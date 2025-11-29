@@ -40,8 +40,13 @@ ggplot(temp, aes(x, y)) + geom_point() + geom_hline(yintercept = 0) +
   geom_hline(yintercept = -1.96, color = "red")+ 
   geom_hline(yintercept = 1.96, color = "red") +
   xlab("") + ylab("t statistics") + theme_classic() + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
 
+# Looking at groups that were made
+tble <- table(ps.strata, fish_clean$high_fish)
+colnames(tble) <- c("Control", "Treated")
+
+tble
 
 
 #Sequential splitting
@@ -138,7 +143,7 @@ eps_blocks
 
 
 
-# Balance check post sequential splitting
+# Balance check post sequential splitting (can see it is slightly improved)
 balance_check <- apply(x, 2, function(v) NeymanSRE(fish_clean$high_fish, v, fish_clean$blocks)) 
 
 
@@ -150,7 +155,7 @@ ggplot(temp, aes(x, y)) + geom_point() + geom_hline(yintercept = 0) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) 
 
 
-#Neyman's ATE Estimate
+#Neyman's ATE Estimate (data as Stratified Random Experiment)
 result <- NeymanSRE(fish_clean$high_fish, fish_clean$mercury, fish_clean$blocks)
 result <- c(result[1:2], c(result[1] - 1.96 * result[2], result[1] + 1.96 * result[2]))
 names(result) <- c("est", "sd", "CI_lower", "CI_upper")
