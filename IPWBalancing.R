@@ -65,7 +65,7 @@ ggplot(plot.data) + geom_point(aes(x = as.numeric(smd), y = covariates, color = 
 
 
 
-###-Trimming-----------------------------------(always makes it worse)
+###-Trimming-----------------------------------
 rm.idx <- which(eps < 0.05 | eps > 0.95)
 temp.data.trimmed <- temp.data[-rm.idx, ]
 fish_indic.trimmed <- fish_indic[-rm.idx, ]
