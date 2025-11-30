@@ -134,14 +134,16 @@ hist_dat$high_fish  <- factor(hist_dat$high_fish,
                               levels = c(0, 1),
                               labels = c("Control", "Treated"))
 
-ggplot(hist_dat, aes(x = age, fill = high_fish)) +
+ggplot(hist_dat, aes(x = age, fill = high_fish, color = high_fish)) +
   geom_histogram(position = "identity", alpha = 0.6) +
   facet_grid(sample ~ .) +
   labs(title = "Age Distributions by Different Procedures (Matching)",
-       x = "age", y = "Count")
+       x = "age", y = "Count") +
+  theme_bw()
 
-ggplot(hist_dat, aes(x = income, fill = high_fish)) +
+ggplot(hist_dat, aes(x = income, fill = high_fish, color = high_fish)) +
   geom_histogram(position = "identity", alpha = 0.6) +
   facet_grid(sample ~ .) +
   labs(title = "Income Distributions by Different Procedures (Matching)",
-       x = "Income", y = "Count")
+       x = "Income", y = "Count") +
+  theme_bw()

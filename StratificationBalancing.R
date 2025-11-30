@@ -174,15 +174,17 @@ hist_dat$high_fish <- factor(
 )
 
 # age blocks
-ggplot(hist_dat, aes(x = age, fill = high_fish)) +
+ggplot(hist_dat, aes(x = age, fill = high_fish, color = high_fish)) +
   geom_histogram(position = "identity", alpha = 0.6) +
   facet_wrap(~ blocks) +
   labs(title = "Age Distributions by Block After Sequential Splitting",
-       x = "Age", y = "Count")
+       x = "Age", y = "Count") +
+  theme_bw()
 
 # income blocks
-ggplot(hist_dat, aes(x = income, fill = high_fish)) +
+ggplot(hist_dat, aes(x = income, fill = high_fish, color = high_fish)) +
   geom_histogram(position = "identity", alpha = 0.6) +
   facet_wrap(~ blocks) +
   labs(title = "Income Distributions by Block After Sequential Splitting",
-       x = "Income", y = "Count")
+       x = "Income", y = "Count") +
+  theme_bw()

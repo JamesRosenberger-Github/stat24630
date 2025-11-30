@@ -160,15 +160,17 @@ hist_dat$high_fish  <- factor(hist_dat$high_fish,
                               labels = c("Control", "Treated"))
 
 # plot for age
-ggplot(hist_dat, aes(x = age, fill = high_fish, weight = w)) +
+ggplot(hist_dat, aes(x = age, fill = high_fish, weight = w, color = high_fish)) +
   geom_histogram(position = "identity", alpha = 0.6) +
   facet_grid(sample ~ .) +
   labs(title = "Trimmed Age Distributions by Procedure (IPW)",
-       x = "Age", y = "Weighted Count")
+       x = "Age", y = "Weighted Count") + 
+  theme_bw()
 
 # plot for income
-ggplot(hist_dat, aes(x = income, fill = high_fish, weight = w)) +
+ggplot(hist_dat, aes(x = income, fill = high_fish, weight = w, color = high_fish)) +
   geom_histogram(position = "identity", alpha = 0.6) +
   facet_grid(sample ~ .) +
   labs(title = "Trimmed Income Distributions by Procedure (IPW)",
-       x = "Income", y = "Weighted Count")
+       x = "Income", y = "Weighted Count") +
+  theme_bw()
