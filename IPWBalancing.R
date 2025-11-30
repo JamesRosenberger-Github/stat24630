@@ -26,6 +26,7 @@ temp.data <- data.frame(weights = weights, treated = as.factor(fish_clean$high_f
 ggplot(temp.data, aes(x = weights, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") + 
   scale_x_log10() +
+  ggtitle("Histogram of weights before trimming") +
   xlab("Weights") +
   theme_bw()
 
@@ -125,7 +126,6 @@ SE <- sqrt(diag(vcovHC(lm.result, type = "HC2")))[2]
 result <- c(tau_hat, SE, c(tau_hat- 1.96 * SE, tau_hat + 1.96 * SE))
 names(result) <- c("est", "sd", "CI_lower", "CI_upper")
 result
-
 
 # using bootstrap
 X <- model.matrix(model.trimmed)

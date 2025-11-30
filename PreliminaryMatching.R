@@ -29,7 +29,7 @@ ggplot(temp.data, aes(x = lps, fill = treated, color = treated)) +
 temp.data_eps <- data.frame(eps = eps, treated = as.factor(fish_clean$high_fish))
 ggplot(temp.data_eps, aes(x = eps, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") + 
-  xlab("Linearized propensity score")
+  xlab("Estimated propensity score")
 
 # Covariate Balancing Before matching
 m.out0 <- matchit(high_fish ~ gender + age + income + income.missing + race +
@@ -82,7 +82,6 @@ print(c(tau_hat, sd_tau_hat))
 
 ## 95% CI
 print(c(tau_hat- 1.96 * sd_tau_hat, tau_hat + 1.96 * sd_tau_hat))
-
 
 
 #Neyman's Approach with Regression Adjustment
