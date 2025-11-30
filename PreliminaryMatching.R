@@ -37,7 +37,7 @@ m.out0 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                   method = NULL, distance = "glm")
 
 summary(m.out0)
-plot0 = plot(summary(m.out0), abs = F)
+plot0 = plot(summary(m.out0), abs = F, main = "Diagnostic Love Plot")
 plot0
 
 # Covariate Balancing after Greedy Matching
@@ -58,7 +58,7 @@ m.out2 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                   estimand = "ATT", 
                   method = "optimal", distance = lps)
 summary(m.out2)
-plot2 = plot(summary(m.out2), abs = F)
+plot2 = plot(summary(m.out2), abs = F, main = "Love Plot after Optimal Matching")
 plot2
 
 matched_fish_opt <- match_data(m.out2)
