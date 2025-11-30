@@ -95,6 +95,22 @@ ggplot(plot.data) + geom_point(aes(x = as.numeric(smd), y = covariates, color = 
   labs(x = 'Standardized Difference in Means') +
   theme_bw()
 
+  # Histogram of trimmed weights (log scale) to compare with untrimmed
+ggplot(temp.data.trimmed, aes(x = weights, fill = treated, color = treated)) + 
+  geom_histogram(alpha = 0.5, position = "identity") + 
+  scale_x_log10() +
+  xlab("Trimmed Weights") +
+  ggtitle("Histogram of weights after trimming") +
+  theme_bw()
+
+# Histogram of eps after trimming
+temp.data.eps.trimmed <- data.frame(eps = eps.trimmed, treated = as.factor(fish_indic.trimmed$high_fish))
+ggplot(temp.data.eps.trimmed, aes(x = eps, fill = treated, color = treated)) + 
+  geom_histogram(alpha = 0.5, position = "identity") +
+  ggtitle("Histogram of eps after trimming") +
+  theme_bw()
+
+
 #------Because trimming made it better, we estimate IPW using the trimmed data
 
 lm.result <- lm(mercury ~ high_fish, weights = weights.trimmed, data = fish_indic.trimmed)
