@@ -79,6 +79,7 @@ eps.trimmed <- predict(model.trimmed, type = "response")
 weights.trimmed <- ifelse(fish_indic.trimmed$high_fish == 1, 1/eps.trimmed, 1/(1 - eps.trimmed))
 temp.data.trimmed$weights <- weights.trimmed
 
+
 #love plot after trimming is better
 raw.smd <- love.plot(fish_indic.trimmed[, -c(1:2)], fish_indic.trimmed$high_fish)
 weighted.smd <- love.plot(fish_indic.trimmed[, -c(1:2)], fish_indic.trimmed$high_fish, weights = weights.trimmed)
