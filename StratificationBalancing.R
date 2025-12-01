@@ -16,24 +16,43 @@ fish_clean <- fish %>%
 model <- glm(high_fish ~ . , data = fish_clean[-1], family = "binomial")
 pscore <- model$fitted.values
 
-# EPS histogram
+# EPS histogram (before trimming)
 temp.data <- data.frame(eps = pscore, treated = as.factor(fish_clean$high_fish))
 ggplot(temp.data, 
        aes(x = eps, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") + 
   xlab("Estimated propensity score") 
 
+# ------ To be consistent with IPW, we trim in a similar fashion prior to stratify
+rm.idx <- which(pscore < 0.05 | pscore > 0.95)
 
-# Trimming doesn't seem necessary so I stratify
-x <- model.matrix(model)[, -1]
-n <- table(fish_clean$high_fish)
-z <- fish_clean$high_fish
-lps <- predict(model)
+fish_clean.trimmed <- fish_clean[-rm.idx, ]
+pscore.trim <- pscore[-rm.idx]
+
+
+## Refitting the propensity score model
+model.trimmed <- glm(high_fish ~ . , data = fish_clean.trimmed[-1], family = "binomial")
+eps.trimmed <- predict(model.trimmed, type = "response")
+lps.trimmed <- predict(model.trimmed)
+
+# Histogram of eps after trimming
+temp.data.eps.trimmed <- data.frame(eps = eps.trimmed, treated = as.factor(fish_clean.trimmed$high_fish))
+ggplot(temp.data.eps.trimmed, aes(x = eps, fill = treated, color = treated)) + 
+  geom_histogram(alpha = 0.5, position = "identity") +
+  ggtitle("Histogram of eps after trimming") +
+  theme_bw()
+
+# ---- end of changed code
+
+# Stratifying after trimming procedure (quantiles)
+x <- model.matrix(model.trimmed)[, -1]
+n <- table(fish_clean.trimmed$high_fish)
+z <- fish_clean.trimmed$high_fish
 
 nn <- 5
-q.pscore <- quantile(pscore , (1:( nn -1)) / nn)
-ps.strata <- cut(pscore, breaks = c(0 , q.pscore ,1), labels = 1:nn)
-balance_check <- apply(x, 2, function(v) NeymanSRE(fish_clean$high_fish, v, ps.strata)) 
+q.pscore <- quantile(pscore.trim, (1:( nn -1)) / nn)
+ps.strata <- cut(pscore.trim, breaks = c(0 , q.pscore, 1), labels = 1:nn)
+balance_check <- apply(x, 2, function(v) NeymanSRE(fish_clean.trimmed$high_fish, v, ps.strata)) 
 
 temp <- data.frame(x = colnames(x), y = balance_check[3, ])
 ggplot(temp, aes(x, y)) + geom_point() + geom_hline(yintercept = 0) +
@@ -43,7 +62,7 @@ ggplot(temp, aes(x, y)) + geom_point() + geom_hline(yintercept = 0) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
 
 # Looking at groups that were made
-tble <- table(ps.strata, fish_clean$high_fish)
+tble <- table(ps.strata, fish_clean.trimmed$high_fish)
 colnames(tble) <- c("Control", "Treated")
 
 tble
@@ -51,7 +70,7 @@ tble
 
 #Sequential splitting
 ## First, create a data frame to store the current grouping information
-temp <- data.frame(e = lps, treat = fish_clean$high_fish, b = 1)
+temp <- data.frame(e = lps.trimmed, treat = fish_clean.trimmed$high_fish, b = 1)
 
 t.max <-  1.96
 # check whether t. stat is above t.max for first iteration
@@ -128,23 +147,23 @@ while(condition)
   condition <- any(abs(t.stat) > t.max)
 }
 
-fish_clean$blocks <- temp$b
+fish_clean.trimmed$blocks <- temp$b
 print("number of individuals per strata")
 
-table(fish_clean[, c("high_fish", "blocks")])
+table(fish_clean.trimmed[, c("high_fish", "blocks")])
 
 ## check the range of estimated propensity scores
-lps_blocks <- sapply(1:max(fish_clean$blocks), 
+lps_blocks <- sapply(1:max(fish_clean.trimmed$blocks), 
                      function(j) range(temp$e[temp$b == j]))
 eps_blocks <- exp(lps_blocks)/(1 + exp(lps_blocks))
-colnames(eps_blocks) <- paste("strata", 1:6)
+colnames(eps_blocks) <- paste("strata", 1:8)
 rownames(eps_blocks) <- c("min eps", "max eps")
 eps_blocks
 
 
 
 # Balance check post sequential splitting (can see it is slightly improved)
-balance_check <- apply(x, 2, function(v) NeymanSRE(fish_clean$high_fish, v, fish_clean$blocks)) 
+balance_check <- apply(x, 2, function(v) NeymanSRE(fish_clean.trimmed$high_fish, v, fish_clean.trimmed$blocks)) 
 
 
 temp <- data.frame(x = colnames(x), y = balance_check[3, ])
@@ -156,7 +175,7 @@ ggplot(temp, aes(x, y)) + geom_point() + geom_hline(yintercept = 0) +
 
 
 #Neyman's ATE Estimate (data as Stratified Random Experiment)
-result <- NeymanSRE(fish_clean$high_fish, fish_clean$mercury, fish_clean$blocks)
+result <- NeymanSRE(fish_clean.trimmed$high_fish, fish_clean.trimmed$mercury, fish_clean.trimmed$blocks)
 result <- c(result[1:2], c(result[1] - 1.96 * result[2], result[1] + 1.96 * result[2]))
 names(result) <- c("est", "sd", "CI_lower", "CI_upper")
 result
@@ -165,7 +184,7 @@ result
 ## Note that original graphs are contained in PreliminaryMatching.R
 
 # creating a new df with needed labels
-hist_dat <- fish_clean[, c("age", "income", "high_fish", "blocks")]
+hist_dat <- fish_clean.trimmed[, c("age", "income", "high_fish", "blocks")]
 
 hist_dat$high_fish <- factor(
   hist_dat$high_fish,
