@@ -26,7 +26,7 @@ temp.data <- data.frame(weights = weights, treated = as.factor(fish_clean$high_f
 ggplot(temp.data, aes(x = weights, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") + 
   scale_x_log10() +
-  ggtitle("Histogram of weights before trimming") +
+  ggtitle("Histogram of Weights Before Trimming") +
   xlab("Weights") +
   theme_bw()
 
@@ -34,7 +34,7 @@ ggplot(temp.data, aes(x = weights, fill = treated, color = treated)) +
 temp.data.eps <- data.frame(eps = eps, treated = as.factor(fish_clean$high_fish))
 ggplot(temp.data.eps, aes(x = eps, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") +
-  ggtitle("Histogram of eps before trimming") +
+  ggtitle("Histogram of EPS Before Trimming") +
   theme_bw()
 
 #changing race into indicator variables
@@ -62,7 +62,8 @@ ggplot(plot.data) + geom_point(aes(x = as.numeric(smd), y = covariates, color = 
              linetype = c("solid", "dashed", "solid", "dashed", "solid")) + 
   xlim(-range, range) +
   labs(x = 'Standardized Difference in Means') +
-  theme_bw()
+  theme_bw() +
+  ggtitle("Love Plot Before Trimming")
 
 
 
@@ -95,21 +96,22 @@ ggplot(plot.data) + geom_point(aes(x = as.numeric(smd), y = covariates, color = 
              linetype = c("solid", "dashed", "solid", "dashed", "solid")) + 
   xlim(-range, range) +
   labs(x = 'Standardized Difference in Means') +
-  theme_bw()
+  theme_bw() +
+  ggtitle("Love Plot After Trimming")
 
   # Histogram of trimmed weights (log scale) to compare with untrimmed
 ggplot(temp.data.trimmed, aes(x = weights, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") + 
   scale_x_log10() +
   xlab("Trimmed Weights") +
-  ggtitle("Histogram of weights after trimming") +
+  ggtitle("Histogram of Weights After Trimming") +
   theme_bw()
 
 # Histogram of eps after trimming
 temp.data.eps.trimmed <- data.frame(eps = eps.trimmed, treated = as.factor(fish_indic.trimmed$high_fish))
 ggplot(temp.data.eps.trimmed, aes(x = eps, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") +
-  ggtitle("Histogram of eps after trimming") +
+  ggtitle("Histogram of EPS After Trimming") +
   theme_bw()
 
 

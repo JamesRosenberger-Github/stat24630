@@ -23,13 +23,18 @@ lps <- predict(model)
 temp.data <- data.frame(lps = lps, treated = as.factor(fish_clean$high_fish))
 ggplot(temp.data, aes(x = lps, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") + 
-  xlab("Linearized propensity score")
+  xlab("Linearized propensity score") +
+  theme_bw() +
+  ggtitle("Linearized Propensity Score (LPS) Historgram")
 
 # EPS Histogram
 temp.data_eps <- data.frame(eps = eps, treated = as.factor(fish_clean$high_fish))
 ggplot(temp.data_eps, aes(x = eps, fill = treated, color = treated)) + 
   geom_histogram(alpha = 0.5, position = "identity") + 
-  xlab("Estimated propensity score")
+  xlab("Estimated propensity score") + 
+  theme_bw() +
+  ggtitle("Estimated Propensity Score (EPS) Historgram")
+
 
 # Covariate Balancing Before matching
 m.out0 <- matchit(high_fish ~ gender + age + income + income.missing + race +
@@ -46,7 +51,7 @@ m.out1 <- matchit(high_fish ~ gender + age + income + income.missing + race +
                   estimand = "ATT", 
                   method = "nearest", distance = lps)
 summary(m.out1)
-plot1 = plot(summary(m.out1), abs = F)
+plot1 = plot(summary(m.out1), abs = F, main = "Love Plot after Greedy Matching")
 plot1
 
 matched_fish_g <- match_data(m.out1)

@@ -59,7 +59,8 @@ ggplot(temp, aes(x, y)) + geom_point() + geom_hline(yintercept = 0) +
   geom_hline(yintercept = -1.96, color = "red")+ 
   geom_hline(yintercept = 1.96, color = "red") +
   xlab("") + ylab("t statistics") + theme_classic() + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  ggtitle("Covariate Mean Difference T-Statistics After Stratification")
 
 # Looking at groups that were made
 tble <- table(ps.strata, fish_clean.trimmed$high_fish)
@@ -171,7 +172,8 @@ ggplot(temp, aes(x, y)) + geom_point() + geom_hline(yintercept = 0) +
   geom_hline(yintercept = -1.96, color = "red")+ 
   geom_hline(yintercept = 1.96, color = "red") +
   xlab("") + ylab("t statistics") + theme_classic() + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1)) +
+  ggtitle("Covariate Mean Difference T-Statistics After Sequential Splitting")
 
 
 #Neyman's ATE Estimate (data as Stratified Random Experiment)
